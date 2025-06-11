@@ -1,0 +1,23 @@
+{
+  "name": "daily-life-tracker",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/juanmalinares/daily-life-tracker.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/juanmalinares/daily-life-tracker/issues"
+  },
+  "homepage": "https://github.com/juanmalinares/daily-life-tracker#readme",
+  "dependencies": {
+    "@octokit/rest": "^22.0.0"
+  }
+}

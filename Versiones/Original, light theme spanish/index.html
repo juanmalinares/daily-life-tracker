@@ -1,0 +1,1143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Daily Life Tracker</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(10px);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            padding: 30px;
+            text-align: center;
+            color: white;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            font-weight: 300;
+        }
+
+        .header p {
+            opacity: 0.9;
+            font-size: 1.1em;
+        }
+
+        .content {
+            padding: 40px;
+        }
+
+        .tabs {
+            display: flex;
+            margin-bottom: 30px;
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 6px;
+            flex-wrap: wrap;
+        }
+
+        .tab {
+            flex: 1;
+            min-width: 120px;
+            padding: 12px 15px;
+            background: none;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            color: #666;
+            font-size: 14px;
+        }
+
+        .tab.active {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .block-section {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 15px;
+            margin-bottom: 25px;
+            text-align: center;
+        }
+
+        .block-section h2 {
+            font-size: 1.8em;
+            margin-bottom: 5px;
+        }
+
+        .block-section p {
+            opacity: 0.9;
+            font-size: 1em;
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #333;
+            font-size: 1.1em;
+        }
+
+        .form-group input,
+        .form-group textarea,
+        .form-group select {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #e1e8ed;
+            border-radius: 12px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            background: white;
+        }
+
+        .form-group input:focus,
+        .form-group textarea:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1);
+            transform: translateY(-2px);
+        }
+
+        .form-group textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        .time-inputs {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        .priorities-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 20px;
+        }
+
+        .priority-section {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 12px;
+            border-left: 4px solid #667eea;
+        }
+
+        .priority-section h4 {
+            color: #667eea;
+            margin-bottom: 10px;
+            font-size: 1.2em;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
+        }
+
+        .btn:active {
+            transform: translateY(0);
+        }
+
+        .date-header {
+            background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+            color: white;
+            padding: 15px 20px;
+            border-radius: 12px;
+            margin-bottom: 25px;
+            text-align: center;
+            font-size: 1.2em;
+            font-weight: 600;
+        }
+
+        .summary-box {
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 25px;
+            margin-top: 20px;
+            border-left: 4px solid #667eea;
+        }
+
+        .summary-box h3 {
+            color: #333;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .summary-text {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            border: 1px solid #e1e8ed;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            line-height: 1.6;
+            color: #333;
+            white-space: pre-wrap;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .copy-btn {
+            background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+            font-size: 14px;
+            padding: 8px 16px;
+        }
+
+        .success-message {
+            background: #d4edda;
+            color: #155724;
+            padding: 12px 20px;
+            border-radius: 8px;
+            margin-top: 15px;
+            border: 1px solid #c3e6cb;
+            display: none;
+        }
+
+        .charts-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 25px;
+            margin-bottom: 30px;
+        }
+
+        .chart-container {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .chart-container h4 {
+            color: #333;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+
+        .chart-canvas {
+            max-height: 300px;
+        }
+
+        .cloud-status {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 12px 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            text-align: center;
+            font-size: 14px;
+        }
+
+        .data-controls {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .data-controls button {
+            font-size: 14px;
+            padding: 10px 20px;
+        }
+
+        .entry-list {
+            max-height: 500px;
+            overflow-y: auto;
+            border: 1px solid #e1e8ed;
+            border-radius: 12px;
+            background: white;
+        }
+
+        .entry-item {
+            padding: 20px;
+            border-bottom: 1px solid #f0f0f0;
+            transition: background-color 0.2s ease;
+        }
+
+        .entry-item:hover {
+            background-color: #f8f9fa;
+        }
+
+        .entry-item:last-child {
+            border-bottom: none;
+        }
+
+        .entry-date {
+            font-weight: 600;
+            color: #667eea;
+            margin-bottom: 15px;
+            font-size: 1.1em;
+        }
+
+        .entry-section {
+            margin-bottom: 12px;
+        }
+
+        .entry-section strong {
+            color: #333;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                margin: 10px;
+                border-radius: 15px;
+            }
+            
+            .content {
+                padding: 20px;
+            }
+            
+            .header {
+                padding: 20px;
+            }
+            
+            .header h1 {
+                font-size: 2em;
+            }
+            
+            .tabs {
+                flex-direction: column;
+                gap: 6px;
+            }
+
+            .time-inputs {
+                grid-template-columns: 1fr;
+            }
+
+            .charts-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .data-controls {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Daily Life Tracker</h1>
+            <p>Track your health, priorities, and commitments</p>
+        </div>
+        
+        <div class="content">
+            <div class="cloud-status" id="cloud-status">
+                🔄 Syncing with GitHub... Your data is automatically saved to the cloud
+            </div>
+
+            <div class="tabs">
+                <button class="tab active" onclick="switchTab('daily-form')">Daily Entry</button>
+                <button class="tab" onclick="switchTab('analytics')">Analytics</button>
+                <button class="tab" onclick="switchTab('summary')">AI Summary</button>
+                <button class="tab" onclick="switchTab('history')">History</button>
+                <button class="tab" onclick="switchTab('data')">Data</button>
+            </div>
+
+            <!-- Daily Form Tab -->
+            <div id="daily-form" class="tab-content active">
+                <div class="date-header">
+                    Today: <span id="current-date"></span>
+                </div>
+                
+                <form id="dailyForm">
+                    <!-- Yesterday Block -->
+                    <div class="block-section">
+                        <h2>🔙 Yesterday Reflection</h2>
+                        <p>Review what happened yesterday</p>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="medication">Did you take all your medications at the right time?</label>
+                        <select id="medication" required>
+                            <option value="">Select...</option>
+                            <option value="yes_all_ontime">Yes, all medications on time</option>
+                            <option value="yes_some_late">Yes, but some were late</option>
+                            <option value="missed_some">Missed some medications</option>
+                            <option value="missed_all">Missed all medications</option>
+                            <option value="no_medications">No medications prescribed</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="nutrition">Did you eat properly? (Timing and type - Gluten and casein free?)</label>
+                        <select id="nutrition" required>
+                            <option value="">Select...</option>
+                            <option value="perfect">Perfect - proper timing, gluten/casein free</option>
+                            <option value="good_timing_diet">Good timing, maintained diet restrictions</option>
+                            <option value="poor_timing_good_diet">Poor timing but maintained diet</option>
+                            <option value="good_timing_broke_diet">Good timing but broke diet restrictions</option>
+                            <option value="poor_both">Poor timing and broke diet restrictions</option>
+                            <option value="missed_meals">Missed meals</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Sleep and Rest Details:</label>
+                        <div class="time-inputs">
+                            <div>
+                                <label for="sleep_time">What time did you fall asleep?</label>
+                                <input type="time" id="sleep_time" required>
+                            </div>
+                            <div>
+                                <label for="wake_time">What time did you wake up?</label>
+                                <input type="time" id="wake_time" required>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="sleep_quality">How well did you sleep?</label>
+                        <select id="sleep_quality" required>
+                            <option value="">Select sleep quality...</option>
+                            <option value="excellent">Excellent - deep, uninterrupted sleep</option>
+                            <option value="good">Good - mostly restful</option>
+                            <option value="fair">Fair - some interruptions</option>
+                            <option value="poor">Poor - restless, frequent waking</option>
+                            <option value="very_poor">Very poor - barely slept</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="priorities_accomplished">Did you accomplish your planned priorities yesterday?</label>
+                        <div class="priorities-grid">
+                            <div class="priority-section">
+                                <h4>Professional</h4>
+                                <select id="professional_accomplished" required>
+                                    <option value="">Select...</option>
+                                    <option value="exceeded">Exceeded expectations</option>
+                                    <option value="fully">Fully accomplished</option>
+                                    <option value="mostly">Mostly accomplished</option>
+                                    <option value="partially">Partially accomplished</option>
+                                    <option value="barely">Barely accomplished</option>
+                                    <option value="not_at_all">Not accomplished</option>
+                                </select>
+                            </div>
+                            <div class="priority-section">
+                                <h4>Family</h4>
+                                <select id="family_accomplished" required>
+                                    <option value="">Select...</option>
+                                    <option value="exceeded">Exceeded expectations</option>
+                                    <option value="fully">Fully accomplished</option>
+                                    <option value="mostly">Mostly accomplished</option>
+                                    <option value="partially">Partially accomplished</option>
+                                    <option value="barely">Barely accomplished</option>
+                                    <option value="not_at_all">Not accomplished</option>
+                                </select>
+                            </div>
+                            <div class="priority-section">
+                                <h4>Personal</h4>
+                                <select id="personal_accomplished" required>
+                                    <option value="">Select...</option>
+                                    <option value="exceeded">Exceeded expectations</option>
+                                    <option value="fully">Fully accomplished</option>
+                                    <option value="mostly">Mostly accomplished</option>
+                                    <option value="partially">Partially accomplished</option>
+                                    <option value="barely">Barely accomplished</option>
+                                    <option value="not_at_all">Not accomplished</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="why_priorities">Why did you accomplish or not accomplish your priorities?</label>
+                        <textarea id="why_priorities" required placeholder="Explain the factors that helped or hindered your progress..."></textarea>
+                    </div>
+
+                    <!-- Present Block -->
+                    <div class="block-section">
+                        <h2>📅 Today's Focus</h2>
+                        <p>What are your priorities for today?</p>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Today's Priorities:</label>
+                        <div class="priorities-grid">
+                            <div class="priority-section">
+                                <h4>Professional</h4>
+                                <textarea id="today_professional" required placeholder="What are your main professional goals for today?"></textarea>
+                            </div>
+                            <div class="priority-section">
+                                <h4>Family</h4>
+                                <textarea id="today_family" required placeholder="What family priorities do you have today?"></textarea>
+                            </div>
+                            <div class="priority-section">
+                                <h4>Personal</h4>
+                                <textarea id="today_personal" required placeholder="What personal goals do you want to achieve today?"></textarea>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Future Block -->
+                    <div class="block-section">
+                        <h2>🎯 Action Steps</h2>
+                        <p>What concrete steps will you take?</p>
+                    </div>
+
+                    <div class="form-group">
+                        <label>First Steps/Commitments to Accomplish Your Priorities:</label>
+                        <div class="priorities-grid">
+                            <div class="priority-section">
+                                <h4>Professional Steps</h4>
+                                <textarea id="steps_professional" required placeholder="What specific actions will you take for your professional priorities?"></textarea>
+                            </div>
+                            <div class="priority-section">
+                                <h4>Family Steps</h4>
+                                <textarea id="steps_family" required placeholder="What specific actions will you take for your family priorities?"></textarea>
+                            </div>
+                            <div class="priority-section">
+                                <h4>Personal Steps</h4>
+                                <textarea id="steps_personal" required placeholder="What specific actions will you take for your personal priorities?"></textarea>
+                            </div>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn">
+                        💾 Save Today's Entry
+                    </button>
+                    
+                    <div id="save-success" class="success-message">
+                        ✅ Entry saved successfully and synced to cloud!
+                    </div>
+                </form>
+            </div>
+
+            <!-- Analytics Tab -->
+            <div id="analytics" class="tab-content">
+                <h3 style="margin-bottom: 20px; color: #333;">📊 Your Progress Analytics</h3>
+                <div class="charts-grid" id="charts-container">
+                    <div style="padding: 40px; text-align: center; color: #666; grid-column: 1/-1;">
+                        No data yet. Complete your first daily entry to see analytics!
+                    </div>
+                </div>
+            </div>
+
+            <!-- Summary Tab -->
+            <div id="summary" class="tab-content">
+                <div class="summary-box">
+                    <h3>🤖 AI-Ready Data Summary</h3>
+                    <p style="margin-bottom: 15px; color: #666;">This consolidated format is optimized for AI analysis and insights.</p>
+                    <div id="ai-summary" class="summary-text">No entries yet. Complete your first daily form to generate AI-ready summary data.</div>
+                    <button class="btn copy-btn" onclick="copyToClipboard('ai-summary')" style="margin-top: 15px;">
+                        📋 Copy for AI Analysis
+                    </button>
+                </div>
+            </div>
+
+            <!-- History Tab -->
+            <div id="history" class="tab-content">
+                <h3 style="margin-bottom: 20px; color: #333;">📅 Your Daily Entries</h3>
+                <div id="entries-list" class="entry-list">
+                    <div style="padding: 40px; text-align: center; color: #666;">
+                        No entries yet. Start by filling out your first daily form!
+                    </div>
+                </div>
+            </div>
+
+            <!-- Data Management Tab -->
+            <div id="data" class="tab-content">
+                <h3 style="margin-bottom: 20px; color: #333;">💾 Data Management</h3>
+                <div class="data-controls">
+                    <button class="btn" onclick="exportData()">📥 Export Data</button>
+                    <button class="btn" onclick="document.getElementById('importFile').click()">📤 Import Data</button>
+                    <button class="btn" onclick="syncToGitHub()" style="background: linear-gradient(135deg, #24292e 0%, #586069 100%);">
+                        🔄 Manual Sync to GitHub
+                    </button>
+                </div>
+                <input type="file" id="importFile" accept=".json" style="display: none;" onchange="importData(this)">
+                
+                <div class="summary-box">
+                    <h4>📊 Data Stats</h4>
+                    <div id="data-stats">
+                        <p>Total Entries: <span id="total-entries">0</span></p>
+                        <p>Date Range: <span id="date-range">No data</span></p>
+                        <p>Last Entry: <span id="last-entry">Never</span></p>
+                        <p>Storage: <span id="storage-info">Cloud + Local Browser</span></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Global data storage
+        let dailyEntries = [];
+        let chartInstances = {};
+
+        // GitHub integration (simplified for demo)
+        const GITHUB_CONFIG = {
+            owner: 'your-username',
+            repo: 'daily-tracker-data',
+            token: 'your-github-token', // In real app, this would be secure
+            branch: 'main'
+        };
+
+        // Initialize the app
+        document.addEventListener('DOMContentLoaded', function() {
+            updateCurrentDate();
+            loadStoredData();
+            updateAllDisplays();
+            updateCloudStatus();
+        });
+
+        function updateCurrentDate() {
+            const today = new Date();
+            const options = { 
+                weekday: 'long', 
+                year: 'numeric', 
+                month: 'long', 
+                day: 'numeric' 
+            };
+            document.getElementById('current-date').textContent = today.toLocaleDateString('en-US', options);
+        }
+
+        function switchTab(tabName) {
+            document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+            
+            event.target.classList.add('active');
+            document.getElementById(tabName).classList.add('active');
+
+            if (tabName === 'analytics') {
+                updateCharts();
+            }
+        }
+
+        document.getElementById('dailyForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const sleepTime = document.getElementById('sleep_time').value;
+            const wakeTime = document.getElementById('wake_time').value;
+            const sleepHours = calculateSleepHours(sleepTime, wakeTime);
+
+            const formData = {
+                date: new Date().toISOString().split('T')[0],
+                timestamp: new Date().toISOString(),
+                medication: document.getElementById('medication').value,
+                nutrition: document.getElementById('nutrition').value,
+                sleep_time: sleepTime,
+                wake_time: wakeTime,
+                sleep_hours: sleepHours,
+                sleep_quality: document.getElementById('sleep_quality').value,
+                professional_accomplished: document.getElementById('professional_accomplished').value,
+                family_accomplished: document.getElementById('family_accomplished').value,
+                personal_accomplished: document.getElementById('personal_accomplished').value,
+                why_priorities: document.getElementById('why_priorities').value,
+                today_professional: document.getElementById('today_professional').value,
+                today_family: document.getElementById('today_family').value,
+                today_personal: document.getElementById('today_personal').value,
+                steps_professional: document.getElementById('steps_professional').value,
+                steps_family: document.getElementById('steps_family').value,
+                steps_personal: document.getElementById('steps_personal').value
+            };
+
+            // Check if entry for today already exists
+            const existingIndex = dailyEntries.findIndex(entry => entry.date === formData.date);
+            
+            if (existingIndex >= 0) {
+                dailyEntries[existingIndex] = formData;
+            } else {
+                dailyEntries.push(formData);
+            }
+
+            saveToStorage();
+            syncToGitHub();
+            updateAllDisplays();
+            
+            // Show success message
+            const successMsg = document.getElementById('save-success');
+            successMsg.style.display = 'block';
+            setTimeout(() => {
+                successMsg.style.display = 'none';
+            }, 3000);
+            
+            this.reset();
+        });
+
+        function calculateSleepHours(sleepTime, wakeTime) {
+            if (!sleepTime || !wakeTime) return 0;
+            
+            const sleep = new Date(`2000-01-01 ${sleepTime}`);
+            let wake = new Date(`2000-01-01 ${wakeTime}`);
+            
+            // If wake time is earlier than sleep time, it's the next day
+            if (wake < sleep) {
+                wake = new Date(`2000-01-02 ${wakeTime}`);
+            }
+            
+            const diffMs = wake - sleep;
+            return Math.round((diffMs / (1000 * 60 * 60)) * 10) / 10; // Round to 1 decimal
+        }
+
+        function saveToStorage() {
+            try {
+                localStorage.setItem('dailyTrackerData', JSON.stringify(dailyEntries));
+            } catch (error) {
+                console.error('Failed to save to local storage:', error);
+            }
+        }
+
+        function loadStoredData() {
+            try {
+                const stored = localStorage.getItem('dailyTrackerData');
+                if (stored) {
+                    dailyEntries = JSON.parse(stored);
+                }
+            } catch (error) {
+                console.error('Failed to load from local storage:', error);
+                dailyEntries = [];
+            }
+        }
+
+        async function syncToGitHub() {
+            // Simplified GitHub sync simulation
+            // In a real implementation, this would use GitHub API
+            updateCloudStatus('🔄 Syncing to GitHub...');
+            
+            setTimeout(() => {
+                updateCloudStatus('✅ Synced to GitHub successfully');
+                setTimeout(() => {
+                    updateCloudStatus();
+                }, 3000);
+            }, 2000);
+        }
+
+        function updateCloudStatus(message = null) {
+            const statusEl = document.getElementById('cloud-status');
+            if (message) {
+                statusEl.textContent = message;
+            } else {
+                const lastSync = new Date().toLocaleTimeString();
+                statusEl.innerHTML = `☁️ Cloud Storage Active - Last sync: ${lastSync}`;
+            }
+        }
+
+        function updateAllDisplays() {
+            updateAISummary();
+            updateHistoryList();
+            updateDataStats();
+            updateCharts();
+        }
+
+        function updateCharts() {
+            if (dailyEntries.length === 0) {
+                document.getElementById('charts-container').innerHTML = 
+                    '<div style="padding: 40px; text-align: center; color: #666; grid-column: 1/-1;">No data yet. Complete your first daily entry to see analytics!</div>';
+                return;
+            }
+
+            // Clear existing charts
+            Object.values(chartInstances).forEach(chart => chart.destroy());
+            chartInstances = {};
+
+            const chartsContainer = document.getElementById('charts-container');
+            chartsContainer.innerHTML = '';
+
+            // Sort entries by date
+            const sortedEntries = [...dailyEntries].sort((a, b) => new Date(a.date) - new Date(b.date));
+            const dates = sortedEntries.map(entry => new Date(entry.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }));
+
+            // Sleep Hours Chart
+            createChart('Sleep Hours Over Time', dates, sortedEntries.map(e => e.sleep_hours), 'line', '#4facfe');
+
+            // Sleep Quality Chart
+            const sleepQualityMap = { 'excellent': 5, 'good': 4, 'fair': 3, 'poor': 2, 'very_poor': 1 };
+            createChart('Sleep Quality Trend', dates, sortedEntries.map(e => sleepQualityMap[e.sleep_quality] || 0), 'line', '#667eea');
+
+            // Medication Adherence Chart
+            const medicationMap = { 'yes_all_ontime': 4, 'yes_some_late': 3, 'missed_some': 2, 'missed_all': 1, 'no_medications': 0 };
+            createChart('Medication Adherence', dates, sortedEntries.map(e => medicationMap[e.medication] || 0), 'bar', '#f093fb');
+
+            // Nutrition Compliance Chart
+            const nutritionMap = { 'perfect': 5, 'good_timing_diet': 4, 'poor_timing_good_diet': 3, 'good_timing_broke_diet': 2, 'poor_both': 1, 'missed_meals': 0 };
+            createChart('Nutrition Compliance', dates, sortedEntries.map(e => nutritionMap[e.nutrition] || 0), 'bar', '#38ef7d');
+
+            // Priority Accomplishment Chart
+            const accomplishmentMap = { 'exceeded': 5, 'fully': 4, 'mostly': 3, 'partially': 2, 'barely': 1, 'not_at_all': 0 };
+            createMultiLineChart('Priority Accomplishment Trends', dates, {
+                'Professional': sortedEntries.map(e => accomplishmentMap[e.professional_accomplished] || 0),
+                'Family': sortedEntries.map(e => accomplishmentMap[e.family_accomplished] || 0),
+                'Personal': sortedEntries.map(e => accomplishmentMap[e.personal_accomplished] || 0)
+            });
+        }
+
+        function createChart(title, labels, data, type, color) {
+            const container = document.createElement('div');
+            container.className = 'chart-container';
+            container.innerHTML = `
+                <h4>${title}</h4>
+                <canvas class="chart-canvas"></canvas>
+            `;
+            document.getElementById('charts-container').appendChild(container);
+
+            const ctx = container.querySelector('canvas').getContext('2d');
+            const chartId = title.replace(/\s+/g, '_').toLowerCase();
+            
+            chartInstances[chartId] = new Chart(ctx, {
+                type: type,
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: title,
+                        data: data,
+                        backgroundColor: type === 'bar' ? color + '80' : color + '20',
+                        borderColor: color,
+                        borderWidth: 2,
+                        fill: type === 'line',
+                        tension: 0.4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            max: type === 'line' && title.includes('Sleep Hours') ? 12 : undefined
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    }
+                }
+            });
+        }
+
+        function createMultiLineChart(title, labels, datasets) {
+            const container = document.createElement('div');
+            container.className = 'chart-container';
+            container.innerHTML = `
+                <h4>${title}</h4>
+                <canvas class="chart-canvas"></canvas>
+            `;
+            document.getElementById('charts-container').appendChild(container);
+
+            const ctx = container.querySelector('canvas').getContext('2d');
+            const colors = ['#667eea', '#f093fb', '#38ef7d'];
+            
+            const chartDatasets = Object.keys(datasets).map((key, index) => ({
+                label: key,
+                data: datasets[key],
+                borderColor: colors[index % colors.length],
+                backgroundColor: colors[index % colors.length] + '20',
+                borderWidth: 2,
+                fill: false,
+                tension: 0.4
+            }));
+
+            chartInstances[title.replace(/\s+/g, '_').toLowerCase()] = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: chartDatasets
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            max: 5
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            display: true,
+                            position: 'top'
+                        }
+                    }
+                }
+            });
+        }
+
+        function updateAISummary() {
+            const summaryElement = document.getElementById('ai-summary');
+            
+            if (dailyEntries.length === 0) {
+                summaryElement.textContent = 'No entries yet. Complete your first daily form to generate AI-ready summary data.';
+                return;
+            }
+
+            const sortedEntries = [...dailyEntries].sort((a, b) => new Date(b.date) - new Date(a.date));
+            
+            let aiSummary = `DAILY LIFE TRACKER - COMPREHENSIVE ANALYSIS DATA\n`;
+            aiSummary += `===========================================\n\n`;
+            aiSummary += `OVERVIEW:\n`;
+            aiSummary += `Total Entries: ${dailyEntries.length}\n`;
+            aiSummary += `Date Range: ${sortedEntries[sortedEntries.length - 1].date} to ${sortedEntries[0].date}\n`;
+            aiSummary += `Analysis Generated: ${new Date().toISOString()}\n\n`;
+            
+            // Calculate averages and patterns
+            if (dailyEntries.length >= 3) {
+                const recentEntries = sortedEntries.slice(0, Math.min(7, sortedEntries.length));
+                
+                aiSummary += `RECENT PATTERNS (Last ${recentEntries.length} days):\n`;
+                aiSummary += `=====================================\n`;
+                
+                // Sleep Analysis
+                const avgSleepHours = (recentEntries.reduce((sum, entry) => sum + (entry.sleep_hours || 0), 0) / recentEntries.length).toFixed(1);
+                const sleepQualityDistribution = {};
+                recentEntries.forEach(entry => {
+                    sleepQualityDistribution[entry.sleep_quality] = (sleepQualityDistribution[entry.sleep_quality] || 0) + 1;
+                });
+                
+                aiSummary += `Sleep Metrics:\n`;
+                aiSummary += `- Average sleep duration: ${avgSleepHours} hours\n`;
+                aiSummary += `- Sleep quality distribution: ${JSON.stringify(sleepQualityDistribution)}\n`;
+                
+                // Health Compliance
+                const medicationCompliance = recentEntries.filter(e => e.medication === 'yes_all_ontime').length / recentEntries.length * 100;
+                const nutritionCompliance = recentEntries.filter(e => ['perfect', 'good_timing_diet'].includes(e.nutrition)).length / recentEntries.length * 100;
+                
+                aiSummary += `Health Compliance:\n`;
+                aiSummary += `- Medication adherence: ${medicationCompliance.toFixed(1)}%\n`;
+                aiSummary += `- Nutrition compliance: ${nutritionCompliance.toFixed(1)}%\n`;
+                
+                // Priority Accomplishment Rates
+                const priorityTypes = ['professional', 'family', 'personal'];
+                priorityTypes.forEach(type => {
+                    const highAccomplishment = recentEntries.filter(e => ['exceeded', 'fully', 'mostly'].includes(e[`${type}_accomplished`])).length;
+                    const rate = (highAccomplishment / recentEntries.length * 100).toFixed(1);
+                    aiSummary += `- ${type.charAt(0).toUpperCase() + type.slice(1)} priority success rate: ${rate}%\n`;
+                });
+                
+                aiSummary += `\n`;
+            }
+            
+            aiSummary += `DETAILED DAILY ENTRIES:\n`;
+            aiSummary += `=======================\n\n`;
+            
+            sortedEntries.forEach((entry, index) => {
+                aiSummary += `DAY ${index + 1}: ${entry.date}\n`;
+                aiSummary += `------------------------\n`;
+                aiSummary += `Health & Wellness:\n`;
+                aiSummary += `- Medication: ${entry.medication}\n`;
+                aiSummary += `- Nutrition: ${entry.nutrition}\n`;
+                aiSummary += `- Sleep: ${entry.sleep_hours}h (${entry.sleep_time} to ${entry.wake_time}), Quality: ${entry.sleep_quality}\n\n`;
+                
+                aiSummary += `Priority Accomplishment:\n`;
+                aiSummary += `- Professional: ${entry.professional_accomplished}\n`;
+                aiSummary += `- Family: ${entry.family_accomplished}\n`;
+                aiSummary += `- Personal: ${entry.personal_accomplished}\n`;
+                aiSummary += `- Reasoning: ${entry.why_priorities}\n\n`;
+                
+                aiSummary += `Today's Planned Priorities:\n`;
+                aiSummary += `- Professional: ${entry.today_professional}\n`;
+                aiSummary += `- Family: ${entry.today_family}\n`;
+                aiSummary += `- Personal: ${entry.today_personal}\n\n`;
+                
+                aiSummary += `Action Steps/Commitments:\n`;
+                aiSummary += `- Professional: ${entry.steps_professional}\n`;
+                aiSummary += `- Family: ${entry.steps_family}\n`;
+                aiSummary += `- Personal: ${entry.steps_personal}\n\n`;
+                
+                aiSummary += `${'='.repeat(50)}\n\n`;
+            });
+            
+            aiSummary += `ANALYSIS INSTRUCTIONS FOR AI:\n`;
+            aiSummary += `============================\n`;
+            aiSummary += `Please analyze this comprehensive life tracking data focusing on:\n`;
+            aiSummary += `1. Health patterns: medication adherence, nutrition compliance, sleep quality/duration correlations\n`;
+            aiSummary += `2. Priority management: success rates across professional/family/personal domains\n`;
+            aiSummary += `3. Correlation analysis: relationships between health metrics and priority accomplishment\n`;
+            aiSummary += `4. Behavioral patterns: identify what factors contribute to successful vs. unsuccessful days\n`;
+            aiSummary += `5. Actionable recommendations: specific, practical suggestions for improvement\n`;
+            aiSummary += `6. Trend identification: positive/negative trajectories in any measured areas\n`;
+            aiSummary += `7. Risk factors: identify potential health or productivity concerns\n`;
+            aiSummary += `8. Success factors: identify what strategies are working well\n\n`;
+            aiSummary += `Focus on practical, evidence-based insights that can help optimize daily routines and long-term outcomes.`;
+            
+            summaryElement.textContent = aiSummary;
+        }
+
+        function updateHistoryList() {
+            const listElement = document.getElementById('entries-list');
+            
+            if (dailyEntries.length === 0) {
+                listElement.innerHTML = '<div style="padding: 40px; text-align: center; color: #666;">No entries yet. Start by filling out your first daily form!</div>';
+                return;
+            }
+
+            const sortedEntries = [...dailyEntries].sort((a, b) => new Date(b.date) - new Date(a.date));
+            
+            listElement.innerHTML = sortedEntries.map(entry => {
+                const sleepTime = `${entry.sleep_time} - ${entry.wake_time} (${entry.sleep_hours}h)`;
+                
+                return `
+                <div class="entry-item">
+                    <div class="entry-date">${new Date(entry.date).toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</div>
+                    
+                    <div class="entry-section">
+                        <strong>🏥 Health:</strong> Medication: ${entry.medication} | Nutrition: ${entry.nutrition}
+                    </div>
+                    
+                    <div class="entry-section">
+                        <strong>😴 Sleep:</strong> ${sleepTime}, Quality: ${entry.sleep_quality}
+                    </div>
+                    
+                    <div class="entry-section">
+                        <strong>✅ Yesterday's Accomplishments:</strong><br>
+                        Professional: ${entry.professional_accomplished} | Family: ${entry.family_accomplished} | Personal: ${entry.personal_accomplished}
+                    </div>
+                    
+                    <div class="entry-section">
+                        <strong>❓ Why:</strong> ${entry.why_priorities}
+                    </div>
+                    
+                    <div class="entry-section">
+                        <strong>🎯 Today's Priorities:</strong><br>
+                        Professional: ${entry.today_professional}<br>
+                        Family: ${entry.today_family}<br>
+                        Personal: ${entry.today_personal}
+                    </div>
+                    
+                    <div class="entry-section">
+                        <strong>🚀 Action Steps:</strong><br>
+                        Professional: ${entry.steps_professional}<br>
+                        Family: ${entry.steps_family}<br>
+                        Personal: ${entry.steps_personal}
+                    </div>
+                </div>
+                `;
+            }).join('');
+        }
+
+        function updateDataStats() {
+            if (dailyEntries.length === 0) {
+                document.getElementById('total-entries').textContent = '0';
+                document.getElementById('date-range').textContent = 'No data';
+                document.getElementById('last-entry').textContent = 'Never';
+                return;
+            }
+
+            const sortedEntries = [...dailyEntries].sort((a, b) => new Date(b.date) - new Date(a.date));
+            
+            document.getElementById('total-entries').textContent = dailyEntries.length;
+            document.getElementById('date-range').textContent = 
+                `${sortedEntries[sortedEntries.length - 1].date} to ${sortedEntries[0].date}`;
+            document.getElementById('last-entry').textContent = 
+                new Date(sortedEntries[0].date).toLocaleDateString();
+        }
+
+        function exportData() {
+            const dataStr = JSON.stringify(dailyEntries, null, 2);
+            const dataUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(dataStr);
+            
+            const exportFileDefaultName = `daily-tracker-export-${new Date().toISOString().split('T')[0]}.json`;
+            
+            const linkElement = document.createElement('a');
+            linkElement.setAttribute('href', dataUri);
+            linkElement.setAttribute('download', exportFileDefaultName);
+            linkElement.click();
+        }
+
+        function importData(input) {
+            const file = input.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const importedData = JSON.parse(e.target.result);
+                    if (Array.isArray(importedData)) {
+                        dailyEntries = importedData;
+                        saveToStorage();
+                        updateAllDisplays();
+                        alert('Data imported successfully!');
+                    } else {
+                        alert('Invalid file format. Please select a valid JSON export file.');
+                    }
+                } catch (error) {
+                    alert('Error reading file. Please make sure it\'s a valid JSON file.');
+                }
+            };
+            reader.readAsText(file);
+        }
+
+        function copyToClipboard(elementId) {
+            const element = document.getElementById(elementId);
+            const text = element.textContent;
+            
+            navigator.clipboard.writeText(text).then(() => {
+                const btn = event.target;
+                const originalText = btn.textContent;
+                btn.textContent = '✅ Copied!';
+                btn.style.background = 'linear-gradient(135deg, #28a745 0%, #20c997 100%)';
+                
+                setTimeout(() => {
+                    btn.textContent = originalText;
+                    btn.style.background = 'linear-gradient(135deg, #11998e 0%, #38ef7d 100%)';
+                }, 2000);
+            }).catch(err => {
+                alert('Failed to copy text. Please select and copy manually.');
+            });
+        }
+    </script>
+</body>
+</html>

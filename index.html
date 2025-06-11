@@ -99,14 +99,8 @@
       margin-bottom: 25px;
       text-align: center;
     }
-    .block-section h2 {
-      font-size: 1.8em;
-      margin-bottom: 5px;
-    }
-    .block-section p {
-      opacity: 0.9;
-      font-size: 1em;
-    }
+    .block-section h2 { font-size: 1.8em; margin-bottom: 5px; }
+    .block-section p  { opacity: 0.9; font-size: 1em; }
     .form-group { margin-bottom: 25px; }
     .form-group label {
       display: block;
@@ -196,75 +190,84 @@
     .charts-grid {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(300px,1fr));
-      gap:25px;
-      margin-bottom:30px;
+      gap: 25px;
+      margin-bottom: 30px;
     }
     .chart-container {
-      background:#2A2A2A;
-      padding:20px;
-      border-radius:8px;
-      box-shadow:0 4px 12px rgba(0,0,0,0.7);
+      background: #2A2A2A;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.7);
     }
     .chart-container h4 {
-      text-align:center;
-      margin-bottom:15px;
+      text-align: center;
+      margin-bottom: 15px;
+      color: var(--text-primary);
     }
     .summary-box {
-      background:#2A2A2A;
-      border-radius:8px;
-      padding:25px;
-      margin-top:20px;
-      border-left:4px solid var(--accent1);
-      color:var(--text-primary);
+      background: #2A2A2A;
+      border-radius: 8px;
+      padding: 25px;
+      margin-top: 20px;
+      border-left: 4px solid var(--accent1);
+      color: var(--text-primary);
     }
     .summary-text {
-      background:#1E1E1E;
-      padding:20px;
-      border:1px solid #333;
-      border-radius:8px;
-      font-family:'Courier New', monospace;
-      font-size:14px;
-      line-height:1.6;
-      color:var(--text-primary);
-      white-space:pre-wrap;
-      max-height:400px;
-      overflow-y:auto;
+      background: #1E1E1E;
+      padding: 20px;
+      border: 1px solid #333;
+      border-radius: 8px;
+      font-family: 'Courier New', monospace;
+      font-size: 14px;
+      line-height: 1.6;
+      color: var(--text-primary);
+      white-space: pre-wrap;
+      max-height: 400px;
+      overflow-y: auto;
     }
-    .copy-btn { margin-top:15px; }
+    .copy-btn { margin-top: 15px; }
     .entry-list {
-      max-height:500px;
-      overflow-y:auto;
-      border:1px solid #333;
-      border-radius:8px;
-      background:#2A2A2A;
+      max-height: 500px;
+      overflow-y: auto;
+      border: 1px solid #333;
+      border-radius: 8px;
+      background: #2A2A2A;
     }
     .entry-item {
-      padding:20px;
-      border-bottom:1px solid #333;
-      transition:background-color 0.2s;
+      padding: 20px;
+      border-bottom: 1px solid #333;
+      transition: background-color 0.2s;
     }
-    .entry-item:hover { background-color:#333; }
-    .entry-item:last-child { border-bottom:none; }
+    .entry-item:hover { background-color: #333; }
+    .entry-item:last-child { border-bottom: none; }
     .entry-date {
-      font-weight:600;
-      color:var(--accent1);
-      margin-bottom:15px;
-      font-size:1.1em;
+      font-weight: 600;
+      color: var(--accent1);
+      margin-bottom: 15px;
+      font-size: 1.1em;
     }
-    .entry-section { margin-bottom:12px; }
-    .entry-section strong { color:var(--text-primary); }
-    @media (max-width:768px) {
-      .container { margin:10px; border-radius:15px; }
-      .content { padding:20px; }
-      .header { padding:20px; }
-      .header h1 { font-size:2em; }
-      .tabs { flex-direction:column; gap:6px; }
-      .time-inputs, .charts-grid { grid-template-columns:1fr; }
-      .data-controls { flex-direction:column; }
+    .entry-section {
+      margin-bottom: 12px;
+    }
+    .entry-section strong {
+      color: var(--text-primary);
+    }
+    @media (max-width: 768px) {
+      .container {
+        margin: 10px;
+        border-radius: 15px;
+      }
+      .content { padding: 20px; }
+      .header { padding: 20px; }
+      .header h1 { font-size: 2em; }
+      .tabs { flex-direction: column; gap: 6px; }
+      .time-inputs,
+      .charts-grid { grid-template-columns: 1fr; }
     }
   </style>
 </head>
 <body>
+
   <div class="container">
     <div class="header">
       <h1>Registro Diario de Actividades</h1>
@@ -462,7 +465,6 @@
         <div class="data-controls">
           <button class="btn" onclick="exportData()">📥 Exportar Datos</button>
           <button class="btn" onclick="document.getElementById('importFile').click()">📤 Importar Datos</button>
-          <button class="btn" onclick="syncToGitHub()">🔄 Sincronizar</button>
         </div>
         <input type="file" id="importFile" accept=".json" style="display:none" onchange="importData(this)"/>
         <div class="summary-box">
@@ -476,22 +478,13 @@
   </div>
 
   <script>
-    // —————————————— Lógica JavaScript sin cambios ——————————————
+    const API = '/.netlify/functions';
     let dailyEntries = [];
     let chartInstances = {};
 
-    const GITHUB_CONFIG = {
-      owner: 'your-username',
-      repo: 'daily-tracker-data',
-      token: 'your-github-token',
-      branch: 'main'
-    };
-
     document.addEventListener('DOMContentLoaded', () => {
       updateCurrentDate();
-      loadStoredData();
-      updateAllDisplays();
-      updateCloudStatus();
+      loadFromCloud();
     });
 
     function updateCurrentDate() {
@@ -502,18 +495,19 @@
     }
 
     function switchTab(id) {
-      document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
-      document.querySelectorAll('.tab-content').forEach(c=>c.classList.remove('active'));
+      document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+      document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
       event.target.classList.add('active');
       document.getElementById(id).classList.add('active');
-      if(id==='analytics') updateCharts();
+      if (id === 'analytics') updateCharts();
     }
 
-    document.getElementById('dailyForm').addEventListener('submit', e => {
+    document.getElementById('dailyForm').addEventListener('submit', async e => {
       e.preventDefault();
       const sleepTime = document.getElementById('sleep_time').value;
-      const wakeTime = document.getElementById('wake_time').value;
-      const sleepHours = calculateSleepHours(sleepTime,wakeTime);
+      const wakeTime  = document.getElementById('wake_time').value;
+      const sleepHours = calculateSleepHours(sleepTime, wakeTime);
+
       const formData = {
         date: new Date().toISOString().split('T')[0],
         timestamp: new Date().toISOString(),
@@ -534,111 +528,192 @@
         steps_family: document.getElementById('steps_family').value,
         steps_personal: document.getElementById('steps_personal').value
       };
-      const idx = dailyEntries.findIndex(x=>x.date===formData.date);
-      if(idx>=0) dailyEntries[idx]=formData; else dailyEntries.push(formData);
-      saveToStorage();
-      syncToGitHub();
-      updateAllDisplays();
-      document.getElementById('save-success').style.display='block';
-      setTimeout(()=>{document.getElementById('save-success').style.display='none';},3000);
-      e.target.reset();
+
+      const idx = dailyEntries.findIndex(x => x.date === formData.date);
+      if (idx >= 0) dailyEntries[idx] = formData;
+      else dailyEntries.push(formData);
+
+      await saveToCloud();
     });
 
-    function calculateSleepHours(s,e){
-      if(!s||!e) return 0;
-      const sleep=new Date(`2000-01-01 ${s}`),
-            wake=new Date(`2000-01-01 ${e}`)<sleep
-              ? new Date(`2000-01-02 ${e}`)
-              : new Date(`2000-01-01 ${e}`);
-      return Math.round(((wake-sleep)/(1000*60*60))*10)/10;
+    function calculateSleepHours(start, end) {
+      if (!start || !end) return 0;
+      const s = new Date(`2000-01-01 ${start}`);
+      let w   = new Date(`2000-01-01 ${end}`);
+      if (w < s) w = new Date(`2000-01-02 ${end}`);
+      return Math.round(((w - s) / 3600000) * 10) / 10;
     }
-    function saveToStorage(){
-      try{ localStorage.setItem('dailyTrackerData', JSON.stringify(dailyEntries)); }
-      catch{ console.error('Error al guardar'); }
+
+    async function loadFromCloud() {
+      updateCloudStatus('🔄 Cargando datos…');
+      try {
+        const res = await fetch(`${API}/load-data`);
+        if (!res.ok) throw '';
+        const { data } = await res.json();
+        dailyEntries = data;
+        updateAllDisplays();
+        updateCloudStatus();
+      } catch (err) {
+        console.error(err);
+        updateCloudStatus('❌ Error al cargar datos');
+      }
     }
-    function loadStoredData(){
-      try{
-        const s=localStorage.getItem('dailyTrackerData');
-        if(s) dailyEntries=JSON.parse(s);
-      }catch{ dailyEntries=[]; }
+
+    async function saveToCloud() {
+      updateCloudStatus('🔄 Guardando en la nube…');
+      try {
+        const res = await fetch(`${API}/save-data`, {
+          method: 'POST',
+          headers: {'Content-Type':'application/json'},
+          body: JSON.stringify({ data: dailyEntries })
+        });
+        if (!res.ok) throw '';
+        updateAllDisplays();
+        document.getElementById('save-success').style.display = 'block';
+        setTimeout(() => {
+          document.getElementById('save-success').style.display = 'none';
+        }, 3000);
+        updateCloudStatus('✅ Guardado exitoso');
+      } catch (err) {
+        console.error(err);
+        updateCloudStatus('❌ Error al guardar');
+      }
     }
-    function syncToGitHub(){
-      updateCloudStatus('🔄 Sincronizando...');
-      setTimeout(()=>{
-        updateCloudStatus('✅ Sincronizado');
-        setTimeout(updateCloudStatus,3000);
-      },2000);
+
+    function updateAllDisplays() {
+      updateCharts();
+      updateAISummary();
+      updateEntriesList();
+      updateDataStats();
     }
-    function updateCloudStatus(msg=null){
-      const el=document.getElementById('cloud-status');
-      if(msg){ el.textContent=msg; el.style.display='block'; }
-      else el.style.display='none';
-    }
-    function updateAllDisplays(){
-      updateCharts(); updateAISummary(); updateEntriesList(); updateDataStats();
-    }
-    function updateCharts(){
-      const ctn=document.getElementById('charts-container');
-      ctn.innerHTML='';
-      if(!dailyEntries.length){
-        ctn.innerHTML='<div style="padding:40px;text-align:center;color:var(--text-secondary);grid-column:1/-1">No hay datos.</div>';
+
+    function updateCharts() {
+      const ctn = document.getElementById('charts-container');
+      ctn.innerHTML = '';
+      if (!dailyEntries.length) {
+        ctn.innerHTML = '<div style="padding:40px;text-align:center;color:var(--text-secondary);grid-column:1/-1">Sin datos.</div>';
         return;
       }
-      if(chartInstances.sleep) chartInstances.sleep.destroy();
-      const sorted=[...dailyEntries].sort((a,b)=>new Date(a.date)-new Date(b.date));
-      const labels=sorted.map(e=>new Date(e.date).toLocaleDateString('es-ES',{ month:'short', day:'numeric'}));
-      const dataSleep=sorted.map(e=>e.sleep_hours);
-      const div=document.createElement('div'); div.className='chart-container';
-      div.innerHTML='<h4>Horas de Sueño</h4><canvas></canvas>'; ctn.appendChild(div);
-      chartInstances.sleep=new Chart(div.querySelector('canvas').getContext('2d'),{
-        type:'line',
-        data:{ labels, datasets:[{ label:'Horas de Sueño', data:dataSleep, borderColor: 'var(--accent1)', borderWidth:2, fill:false, tension:0.3 }]},
-        options:{ scales:{ x:{ ticks:{ color: 'var(--text-primary)' } }, y:{ ticks:{ color:'var(--text-primary)' }}}, plugins:{ legend:{ labels:{ color:'var(--text-primary)' }}}}
+      if (chartInstances.sleep) chartInstances.sleep.destroy();
+
+      const sorted = [...dailyEntries].sort((a,b) => new Date(a.date) - new Date(b.date));
+      const labels = sorted.map(e => new Date(e.date).toLocaleDateString('es-ES',{ month:'short', day:'numeric' }));
+      const dataSleep = sorted.map(e => e.sleep_hours);
+
+      const div = document.createElement('div');
+      div.className = 'chart-container';
+      div.innerHTML = `<h4>Horas de Sueño</h4><canvas></canvas>`;
+      ctn.appendChild(div);
+
+      chartInstances.sleep = new Chart(div.querySelector('canvas').getContext('2d'), {
+        type: 'line',
+        data: {
+          labels,
+          datasets: [{
+            label: 'Horas de Sueño',
+            data: dataSleep,
+            borderColor: 'var(--accent1)',
+            borderWidth: 2,
+            fill: false,
+            tension: 0.3
+          }]
+        },
+        options: {
+          scales: {
+            x: { ticks: { color: 'var(--text-primary)' } },
+            y: { ticks: { color: 'var(--text-primary)' } }
+          },
+          plugins: {
+            legend: { labels: { color: 'var(--text-primary)' } }
+          }
+        }
       });
     }
-    function updateAISummary(){
-      const el=document.getElementById('ai-summary');
-      if(!dailyEntries.length){ el.textContent='Sin datos.'; return; }
-      el.textContent=`Total de entradas: ${dailyEntries.length}`; // resumen sencillo
-    }
-    function updateEntriesList(){
-      const el=document.getElementById('entries-list'); el.innerHTML='';
-      if(!dailyEntries.length){
-        el.innerHTML='<div style="padding:40px;text-align:center;color:var(--text-secondary)">Sin entradas.</div>'; return;
+
+    function updateAISummary() {
+      const el = document.getElementById('ai-summary');
+      if (!dailyEntries.length) {
+        el.textContent = 'Sin datos para resumir.';
+        return;
       }
-      [...dailyEntries].sort((a,b)=>new Date(b.date)-new Date(a.date)).forEach(e=>{
-        const d=document.createElement('div'); d.className='entry-item';
-        d.innerHTML=`
-          <div class="entry-date">${new Date(e.date).toLocaleDateString('es-ES')}</div>
-          <div class="entry-section"><strong>Medicamentos:</strong> ${e.medication}</div>
-          <div class="entry-section"><strong>Nutrición:</strong> ${e.nutrition}</div>
-          <div class="entry-section"><strong>Sueño:</strong> ${e.sleep_hours}h (${e.sleep_quality})</div>
-        `;
-        el.appendChild(d);
-      });
+      el.textContent = `Total de entradas: ${dailyEntries.length}`;
     }
-    function updateDataStats(){
-      document.getElementById('total-entries').textContent=dailyEntries.length;
-      if(!dailyEntries.length) return;
-      const ds=[...dailyEntries].map(e=>new Date(e.date)).sort((a,b)=>a-b);
-      document.getElementById('date-range').textContent=`${ds[0].toLocaleDateString('es-ES')} – ${ds[ds.length-1].toLocaleDateString('es-ES')}`;
-      document.getElementById('last-entry').textContent=new Date(ds[ds.length-1]).toLocaleDateString('es-ES');
+
+    function updateEntriesList() {
+      const container = document.getElementById('entries-list');
+      container.innerHTML = '';
+      if (!dailyEntries.length) {
+        container.innerHTML = '<div style="padding:40px;text-align:center;color:var(--text-secondary)">Sin entradas.</div>';
+        return;
+      }
+      [...dailyEntries].sort((a,b) => new Date(b.date)-new Date(a.date))
+        .forEach(e => {
+          const d = document.createElement('div');
+          d.className = 'entry-item';
+          d.innerHTML = `
+            <div class="entry-date">${new Date(e.date).toLocaleDateString('es-ES')}</div>
+            <div class="entry-section"><strong>Medicamentos:</strong> ${e.medication}</div>
+            <div class="entry-section"><strong>Nutrición:</strong> ${e.nutrition}</div>
+            <div class="entry-section"><strong>Sueño:</strong> ${e.sleep_hours}h (${e.sleep_quality})</div>
+          `;
+          container.appendChild(d);
+        });
     }
-    function exportData(){
-      const blob=new Blob([JSON.stringify(dailyEntries,null,2)],{type:'application/json'});
-      const url=URL.createObjectURL(blob);
-      const a=document.createElement('a'); a.href=url; a.download='registro.json'; a.click();
+
+    function updateDataStats() {
+      document.getElementById('total-entries').textContent = dailyEntries.length;
+      if (!dailyEntries.length) return;
+      const dates = dailyEntries.map(e => new Date(e.date)).sort((a,b) => a-b);
+      document.getElementById('date-range').textContent =
+        `${dates[0].toLocaleDateString('es-ES')} – ${dates[dates.length-1].toLocaleDateString('es-ES')}`;
+      document.getElementById('last-entry').textContent =
+        new Date(dailyEntries[dailyEntries.length-1].date).toLocaleDateString('es-ES');
     }
-    function importData(input){
-      const f=input.files[0]; if(!f) return;
-      const reader=new FileReader();
-      reader.onload=()=>{ try{ const arr=JSON.parse(reader.result); if(Array.isArray(arr)){ dailyEntries=arr; saveToStorage(); updateAllDisplays(); alert('Importado'); } }catch{alert('Error');} };
-      reader.readAsText(f);
+
+    function exportData() {
+      const blob = new Blob([JSON.stringify(dailyEntries,null,2)],{type:'application/json'});
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url; a.download = 'registro_diario_actividades.json'; a.click();
+      URL.revokeObjectURL(url);
     }
-    function copyToClipboard(id){
-      const txt=document.getElementById(id).textContent;
-      navigator.clipboard.writeText(txt).then(()=>alert('Copiado'));
+
+    function importData(input) {
+      const file = input.files[0]; if (!file) return;
+      const reader = new FileReader();
+      reader.onload = () => {
+        try {
+          const arr = JSON.parse(reader.result);
+          if (Array.isArray(arr)) {
+            dailyEntries = arr;
+            saveToCloud();
+          } else {
+            alert('Formato inválido');
+          }
+        } catch {
+          alert('Error leyendo JSON');
+        }
+      };
+      reader.readAsText(file);
+    }
+
+    function copyToClipboard(id) {
+      const text = document.getElementById(id).textContent;
+      navigator.clipboard.writeText(text)
+        .then(() => alert('Copiado al portapapeles'))
+        .catch(() => alert('Error al copiar'));
+    }
+
+    function updateCloudStatus(msg = null) {
+      const el = document.getElementById('cloud-status');
+      if (msg) {
+        el.textContent = msg;
+        el.style.display = 'block';
+      } else {
+        el.style.display = 'none';
+      }
     }
   </script>
+
 </body>
 </html>
